@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        NODE_VERSION = '18'  // версія Node.js, яку треба ставити
+        NODE_VERSION = '18'
     }
 
     stages {
@@ -14,14 +14,14 @@ pipeline {
 
         stage('Setup Node.js') {
             steps {
-                // Встановлюємо Node.js (через nvm або NodeJS Plugin у Jenkins)
-                sh """
-                . ~/.nvm/nvm.sh
+                sh '''
+                export NVM_DIR="$HOME/.nvm"
+                [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
                 nvm install $NODE_VERSION
                 nvm use $NODE_VERSION
                 node -v
                 npm -v
-                """
+                '''
             }
         }
 
@@ -33,30 +33,42 @@ pipeline {
 
         stage('Run tests') {
             steps {
-                sh 'npm test' // якщо немає тестів, можна прибрати цей stage
+                sh 'npm test'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'npm run build' // якщо в package.json є build-скрипт
+                sh 'npm run build'
             }
         }
 
-        stage('Start') {
+        stage('Deploy to Production') {
             steps {
-                echo '🚀 Starting application...'
-                sh 'npm start &'
+                sshagent(['5bcc959c-f4c6-45c4-b4c1-f6689f9494a8']) {
+                    sh '''
+                    echo "📦 Deploying to 192.168.56.10..."
+
+                    # Копіюємо білд
+                    rsync -avz --delete ./dist/ user@192.168.56.10:/home/user/app/
+
+                    # Перезапускаємо або запускаємо з pm2
+                    ssh user@192.168.56.10 '
+                        cd /home/user/app &&
+                        pm2 restart app-name || pm2 start dist/index.js --name app-name
+                    '
+                    '''
+                }
             }
         }
     }
 
     post {
         success {
-            echo '✅ Build успішно завершено!'
+            echo '✅ Успішно завершено!'
         }
         failure {
-            echo '❌ Build провалився!'
+            echo '❌ Помилка під час виконання.'
         }
     }
 }
