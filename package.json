@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
- "test": "echo \"No tests defined\""    
+    "test": "echo \"No tests defined\"",
+    "build": "echo \"No build step yet\""
   },
   "keywords": [],
   "author": "",
