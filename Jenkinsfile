@@ -27,6 +27,8 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'npm run build'
+                // 🔧 Створити папку dist, якщо її нема
+                sh 'mkdir -p dist'
             }
         }
 
