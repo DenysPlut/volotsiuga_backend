@@ -55,7 +55,7 @@ pipeline {
                     # Перезапускаємо або запускаємо з pm2
                     ssh user@192.168.56.10 '
                         cd /home/user/app &&
-                        pm2 restart app-name || pm2 start dist/index.js --name app-name
+                        pm2 restart app-name || npx pm2 start dist/index.js --name app-name 
                     '
                     '''
                 }
