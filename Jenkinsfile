@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'nodejs'  // <-- назва NodeJS Tool, який ти додав у Jenkins
+        nodejs 'nodejs24'  // <-- назва NodeJS Tool, який ти додав у Jenkins
     }
 
     stages {
