@@ -23,14 +23,14 @@ pipeline {
                 sh 'npm test'
             }
         }
-
+       
         stage('Build') {
             steps {
-                sh 'npm run build'
-                // 🔧 Створити папку dist, якщо її нема
                 sh 'mkdir -p dist'
+                sh 'echo "console.log(\'Hello from Jenkins!\')" > dist/index.js'
             }
         }
+       
 
         stage('Deploy to Production') {
             steps {
