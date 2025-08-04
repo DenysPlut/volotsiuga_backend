@@ -41,7 +41,7 @@ pipeline {
                     ssh vagrant@192.168.56.10 '
                         cd /home/vagrant/app &&
                         npm install &&
-                        npx pm2 restart backend-app || npx pm2 start src/server.js --name backend-app
+                        npx pm2 restart backend-app || npx pm2 start server.js --name backend-app
                     '
                     '''
                 }
