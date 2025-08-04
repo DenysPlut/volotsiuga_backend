@@ -2,18 +2,20 @@
   "name": "backend",
   "version": "1.0.0",
   "type": "module",
-  "scripts": {
-    "test": "echo \"No tests defined\"",
-    "build": "mkdir -p dist && echo \"console.log('Hello from build')\" > dist/index.js"
-  },
-  "keywords": [],
+  "description": "",
   "author": "",
   "license": "ISC",
+  "keywords": [],
+  "scripts": {
+    "test": "echo \"No tests defined\"",
+    "build": "mkdir -p dist && echo \"console.log('Hello from build')\" > dist/index.js",
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "nodemon": "^3.1.10"
-  },
-  "description": ""
+  }
 }

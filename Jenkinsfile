@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'node24'  // <-- назва NodeJS Tool, який ти додав у Jenkins
+        nodejs 'node24'
     }
 
     stages {
@@ -26,8 +26,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mkdir -p dist'
-                sh 'echo "console.log(\'Hello from Jenkins!\')" > dist/index.js'
+                echo 'No build needed – plain Node.js app'
             }
         }
 
@@ -35,17 +34,14 @@ pipeline {
             steps {
                 sshagent(['5bcc959c-f4c6-45c4-b4c1-f6689f9494a8']) {
                     sh '''
-                    echo "=== Файли в dist перед rsync ==="
-                    ls -la dist
+                    echo "=== Копіюємо проект на прод ==="
+                    rsync -avz --delete --exclude=".git" ./ vagrant@192.168.56.10:/home/vagrant/app/
 
-                    # Копіюємо всю папку dist, а не лише її вміст
-                    rsync -avz --delete ./dist vagrant@192.168.56.10:/home/vagrant/app/
-
+                    echo "=== Перезапускаємо backend через PM2 ==="
                     ssh vagrant@192.168.56.10 '
                         cd /home/vagrant/app &&
-                        echo "=== Файли на проді ===" &&
-                        ls -la dist &&
-                        npx pm2 restart app-name || npx pm2 start dist/index.js --name app-name
+                        npm install &&
+                        npx pm2 restart backend-app || npx pm2 start src/server.js --name backend-app
                     '
                     '''
                 }
@@ -55,10 +51,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Успішно завершено!'
+            echo '✅ Деплой завершено успішно!'
         }
         failure {
-            echo '❌ Помилка під час виконання.'
+            echo '❌ Помилка при деплої.'
         }
     }
 }
