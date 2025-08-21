@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: volotsiuga-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: volotsiuga-backend
+  template:
+    metadata:
+      labels:
+        app: volotsiuga-backend
+    spec:
+      containers:
+      - name: volotsiuga
+        image: volotsiuga:latest        
+        ports:
+        - containerPort: 8881          
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: volotsiuga-backend-service
+spec:
+  selector:
+    app: volotsiuga-backend
+  ports:
+  - port: 8881
+    targetPort: 8881
+    nodePort: 30081
+  type: NodePort
