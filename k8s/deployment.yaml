@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: volotsiuga
-        image: volotsiuga:latest        
+        image: localhost:5000/volotsiuga:latest       
         ports:
         - containerPort: 8881          
 ---
