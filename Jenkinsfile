@@ -49,17 +49,17 @@ pipeline {
                         kubectl --kubeconfig=$KUBECONFIG --insecure-skip-tls-verify=true apply -f k8s/deployment.yaml --validate=false
                         kubectl --kubeconfig=$KUBECONFIG --insecure-skip-tls-verify=true apply -f k8s/service.yaml --validate=false || true
                     '''
+                }
             }
         }
- }
-
+    }
 
     post {
-        success {            echo '✅ Деплой у Kubernetes завершено успішно!'
+        success {
+            echo '✅ Деплой у Kubernetes завершено успішно!'
         }
         failure {
             echo '❌ Помилка при деплої.'
         }
     }
 }
-
