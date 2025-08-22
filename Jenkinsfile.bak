@@ -31,23 +31,22 @@ pipeline {
 
         stage('Build & Push Docker Image') {
             steps {
-                sh '''
-                    docker build -t $DOCKER_IMAGE .
-                    docker push $DOCKER_IMAGE
-                '''
+                script {
+                    sh """
+                        docker build -t ${DOCKER_IMAGE} .
+                        docker push ${DOCKER_IMAGE}
+                    """
+                }
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
                 withCredentials([file(credentialsId: 'prod-kubeconfig', variable: 'KUBECONFIG')]) {
-                    sh '''
-                        echo "🔧 Updating deployment manifest..."
-                        sed -i "s|image:.*|image: $DOCKER_IMAGE|g" k8s/deployment.yaml
-                        echo "🚀 Applying manifests..."
-                        kubectl --kubeconfig=$KUBECONFIG apply -f k8s/deployment.yaml --validate=false
-                        kubectl --kubeconfig=$KUBECONFIG apply -f k8s/service.yaml --validate=false || true
-                    '''
+                    sh """
+                        sed -i 's|image:.*|image: ${DOCKER_IMAGE}|g' k8s/deployment.yaml
+                        kubectl --kubeconfig=$KUBECONFIG apply -f k8s/deployment.yaml
+                    """
                 }
             }
         }
