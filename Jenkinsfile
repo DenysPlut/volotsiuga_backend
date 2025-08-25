@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = '192.168.56.10:5000'
+        DOCKER_REGISTRY = '10.0.2.15:5000'
         DOCKER_IMAGE = "${DOCKER_REGISTRY}/volotsiuga:${BUILD_NUMBER}"
     }
 
