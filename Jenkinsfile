@@ -19,7 +19,7 @@ pipeline {
 
         stage('Install dependencies') {
             steps {
-                sh 'npm install'
+                sh 'npm ci'
             }
         }
 
@@ -31,23 +31,24 @@ pipeline {
 
         stage('Build & Push Docker Image') {
             steps {
-                sh '''
-                    docker build -t $DOCKER_IMAGE .
-                    docker push $DOCKER_IMAGE
-                '''
+                withCredentials([usernamePassword(credentialsId: 'docker-registry-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login $DOCKER_REGISTRY -u $DOCKER_USER --password-stdin
+                        docker build -t $DOCKER_IMAGE .
+                        docker push $DOCKER_IMAGE
+                    '''
+                }
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Deploy with Ansible') {
             steps {
-                withCredentials([file(credentialsId: 'prod-kubeconfig', variable: 'KUBECONFIG')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'prod-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                        echo "🔧 Updating deployment manifest..."
-                        sed -i "s|image:.*|image: $DOCKER_IMAGE|g" k8s/deployment.yaml
-
-                        echo "🚀 Applying manifests..."
-                        kubectl --kubeconfig=$KUBECONFIG --insecure-skip-tls-verify=true apply -f k8s/deployment.yaml --validate=false
-                        kubectl --kubeconfig=$KUBECONFIG --insecure-skip-tls-verify=true apply -f k8s/service.yaml --validate=false || true
+                        echo "🔧 Запуск Ansible playbook для деплою..."
+                        ansible-playbook -i ansible/inventory ansible/deploy.yml \
+                          --extra-vars "docker_image=$DOCKER_IMAGE" \
+                          --key-file $SSH_KEY
                     '''
                 }
             }
@@ -56,7 +57,7 @@ pipeline {
 
     post {
         success {
-            echo '✅ Деплой у Kubernetes завершено успішно!'
+            echo '✅ Деплой завершено успішно!'
         }
         failure {
             echo '❌ Помилка при деплої.'
