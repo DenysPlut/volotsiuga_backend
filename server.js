@@ -1,8 +1,9 @@
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const { Pool } = require("pg");
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import pkg from "pg";
 
+const { Pool } = pkg;
 const app = express();
 const PORT = 8881;
 
@@ -15,7 +16,7 @@ const pool = new Pool({
   user: "testuser",       // твій юзер PostgreSQL
   host: "localhost",
   database: "testdb",     // твоя база
-  password: "your_password", // заміни на свій пароль
+  password: "DRmufWIN1234", // заміни на свій пароль
   port: 5432,
 });
 
