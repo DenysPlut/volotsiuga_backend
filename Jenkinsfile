@@ -40,14 +40,11 @@ pipeline {
 
         stage('Deploy with Ansible') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'prod-ssh-key', keyFileVariable: 'SSH_KEY')]) {
-                    sh '''
-                        echo "🔧 Запуск Ansible playbook для деплою..."
-                        ansible-playbook -i ansible/inventory ansible/deploy.yml \
-                          --extra-vars "docker_image=$DOCKER_IMAGE" \
-                          --key-file $SSH_KEY
-                    '''
-                }
+                sh '''
+                    echo "🔧 Запуск Ansible playbook для деплою..."
+                    ansible-playbook -i ansible/inventory ansible/deploy.yml \
+                      --extra-vars "docker_image=$DOCKER_IMAGE"
+                '''
             }
         }
     }
