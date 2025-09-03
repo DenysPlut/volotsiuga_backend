@@ -42,7 +42,7 @@ pipeline {
             steps {
                 sh '''
                     echo "🔧 Запуск Ansible playbook для деплою..."
-                    ansible-playbook -i /var/lib/jenkins/ansible/inventory.ini /var/lib/jenkins/ansible/deploy.yaml \
+                    ansible-playbook -i /var/lib/jenkins/ansible/inventory.ini /var/lib/jenkins/ansible/deploy.yml \
                       --extra-vars "docker_image=$DOCKER_IMAGE"
                 '''
             }
