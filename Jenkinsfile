@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = '192.168.56.10:5000'
+        DOCKER_REGISTRY = '192.168.56.20:5000'   // ✅ registry на Jenkins VM
         DOCKER_IMAGE = "${DOCKER_REGISTRY}/volotsiuga:${BUILD_NUMBER}"
     }
 
@@ -32,6 +32,7 @@ pipeline {
         stage('Build & Push Docker Image') {
             steps {
                 sh '''
+                    echo "📦 Будуємо Docker-образ: $DOCKER_IMAGE"
                     docker build -t $DOCKER_IMAGE .
                     docker push $DOCKER_IMAGE
                 '''
@@ -41,9 +42,9 @@ pipeline {
         stage('Deploy with Ansible') {
             steps {
                 withCredentials([sshUserPrivateKey(
-                    credentialsId: 'prod-ssh-key',   // ← ID з Jenkins Credentials
-                    keyFileVariable: 'SSH_KEY',      // ← Jenkins підставить файл із ключем
-                    usernameVariable: 'SSH_USER'     // ← Jenkins підставить юзера з Credential
+                    credentialsId: 'prod-ssh-key',   // ID ключа в Jenkins Credentials
+                    keyFileVariable: 'SSH_KEY',
+                    usernameVariable: 'SSH_USER'
                 )]) {
                     sh '''
                         echo "🔧 Запуск Ansible playbook для деплою..."
