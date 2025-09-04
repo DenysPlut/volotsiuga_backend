@@ -40,12 +40,17 @@ pipeline {
 
         stage('Deploy with Ansible') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'prod-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: 'prod-ssh-key',   // ← ID з Jenkins Credentials
+                    keyFileVariable: 'SSH_KEY',      // ← Jenkins підставить файл із ключем
+                    usernameVariable: 'SSH_USER'     // ← Jenkins підставить юзера з Credential
+                )]) {
                     sh '''
                         echo "🔧 Запуск Ansible playbook для деплою..."
                         ansible-playbook -i /var/lib/jenkins/ansible/inventory.ini \
                           /var/lib/jenkins/ansible/deploy.yml \
                           --extra-vars "docker_image=$DOCKER_IMAGE" \
+                          --user $SSH_USER \
                           --key-file $SSH_KEY
                     '''
                 }
